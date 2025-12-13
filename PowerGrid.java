@@ -22,9 +22,8 @@ public class PowerGrid {
     private static final int INFINITY = Integer.MAX_VALUE;
     public static List<Edge> mst(List<List<Edge>> graph) {
         Map<Integer, Integer[]> predecessorsAndCosts = new HashMap<>();
-        final Integer[] init = {null, INFINITY};
         for (int i = 1; i < graph.size(); i++)
-            predecessorsAndCosts.put(i, init);
+            predecessorsAndCosts.put(i, new Integer[]{null, INFINITY});
         final Comparator<Integer> comparator = (x, y) -> {
             int xCost = predecessorsAndCosts.get(x)[1], yCost = predecessorsAndCosts.get(y)[1];
             return xCost != yCost
@@ -44,16 +43,18 @@ public class PowerGrid {
                     int cost = predecessorsAndCosts.get(vertex)[1];
                     int weight = e.weight;
                     if (weight < cost) {
+                        unvisited.remove(vertex);
                         Integer[] predecessorAndCost = predecessorsAndCosts.get(vertex);
                         predecessorAndCost[0] = min;
                         predecessorAndCost[1] = weight;
+                        unvisited.add(vertex);
                     }
                 }
             }
         }
         List<Edge> mst = new ArrayList<>();
-        for (int i = 1; i < graph.size(); i++) {
-            int predecessor = predecessorsAndCosts.get(i)[0], weight = predecessorsAndCosts.get(i)[1];
+        for (int i = 2; i < graph.size(); i++) {
+            Integer predecessor = predecessorsAndCosts.get(i)[0], weight = predecessorsAndCosts.get(i)[1];
             mst.add(new Edge(predecessor, i, weight, null));
         }
         return mst;
@@ -77,6 +78,21 @@ public class PowerGrid {
         Edge ef = new Edge(5, 6, 2, null), fe = new Edge(6, 5, 2, null);
         e.add(ef);
         f.add(fe);
+        Edge bc = new Edge(2, 3, 1, null), cb = new Edge(3, 2, 1, null);
+        b.add(bc);
+        c.add(cb);
+        Edge cf = new Edge(3, 6, 4, null), fc = new Edge(6, 3, 4, null);
+        c.add(cf);
+        f.add(fc);
+        Edge cd = new Edge(3, 4, 6, null), dc = new Edge(4, 3, 6, null);
+        c.add(cd);
+        d.add(dc);
+        Edge de = new Edge(4, 5, 8, null), ed = new Edge(5, 4, 8, null);
+        d.add(de);
+        e.add(ed);
+        Edge df = new Edge(4, 6, 5, null), fd = new Edge(6, 4, 5, null);
+        d.add(df);
+        f.add(fd);
         graph.add(null);
         graph.add(a);
         graph.add(b);
