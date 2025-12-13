@@ -19,13 +19,13 @@ public class PowerGrid {
         }
     }
 
-    private static final int INFINITY = Integer.MAX_VALUE;
+    private static final int NIL = -1, INFINITY = Integer.MAX_VALUE;
     public static List<Edge> mst(List<List<Edge>> graph) {
-        Map<Integer, Integer[]> predecessorsAndCosts = new HashMap<>();
+        int[][] predecessorsAndCosts = new int[graph.size()][];
         for (int i = 1; i < graph.size(); i++)
-            predecessorsAndCosts.put(i, new Integer[]{null, INFINITY});
+            predecessorsAndCosts[i] = new int[]{NIL, INFINITY};
         final Comparator<Integer> comparator = (x, y) -> {
-            int xCost = predecessorsAndCosts.get(x)[1], yCost = predecessorsAndCosts.get(y)[1];
+            int xCost = predecessorsAndCosts[x][1], yCost = predecessorsAndCosts[y][1];
             return xCost != yCost
                 ? xCost - yCost
                 : x - y;
@@ -33,18 +33,18 @@ public class PowerGrid {
         PriorityQueue<Integer> unvisited = new PriorityQueue<>(comparator);
         for (int i = 1; i < graph.size(); i++)
             unvisited.add(i);
-        List<Integer> visited = new ArrayList<>();
+        boolean[] visited = new boolean[graph.size()];
         while (!unvisited.isEmpty()) {
             int min = unvisited.poll();
-            visited.add(min);
+            visited[min] = true;
             for (Edge e : graph.get(min)) {
                 int vertex = e.end;
-                if (!visited.contains(vertex)) {
-                    int cost = predecessorsAndCosts.get(vertex)[1];
+                if (!visited[vertex]) {
+                    int cost = predecessorsAndCosts[vertex][1];
                     int weight = e.weight;
                     if (weight < cost) {
                         unvisited.remove(vertex);
-                        Integer[] predecessorAndCost = predecessorsAndCosts.get(vertex);
+                        int[] predecessorAndCost = predecessorsAndCosts[vertex];
                         predecessorAndCost[0] = min;
                         predecessorAndCost[1] = weight;
                         unvisited.add(vertex);
@@ -54,8 +54,10 @@ public class PowerGrid {
         }
         List<Edge> mst = new ArrayList<>();
         for (int i = 2; i < graph.size(); i++) {
-            Integer predecessor = predecessorsAndCosts.get(i)[0], weight = predecessorsAndCosts.get(i)[1];
-            mst.add(new Edge(predecessor, i, weight, null));
+            int predecessor = predecessorsAndCosts[i][0];
+            for (Edge e : graph.get(predecessor))
+                if (e.end == i)
+                    mst.add(e);
         }
         return mst;
     }
@@ -105,6 +107,7 @@ public class PowerGrid {
 
     public static void main(String[] args) {
         List<List<Edge>> graph = init();
+        System.out.println(graph);
         System.out.println(mst(graph));
     }
 }
